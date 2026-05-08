@@ -1,17 +1,37 @@
 chrome.storage.local.get(['site1', 'site2', 'enabled'], (data) => {
   if (!data.enabled || !data.site1 || !data.site2) return;
 
-  if (window.location.href.startsWith(data.site2)) {
-    
-    window.addEventListener('load', () => {
+  const isMainPage = window.location.href.startsWith(data.site2) && window === window.top;
+  const isIframe = window !== window.top;
+
+  // Логика главной страницы (Сайт 2)
+  if (isMainPage) {
+    // Прячем URL вкладки
+    document.title = '\u200B';
+
+    // Получаем title из фрейма
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message.action === "updateTitle" && message.title) {
+        document.title = message.title;
+      }
+    });
+
+    const initReplacement = () => {
+      const currentTitle = document.title;
       document.documentElement.innerHTML = '';
       
+      // Восстанавливаем <head> и <title>
+      const head = document.createElement('head');
+      const titleEl = document.createElement('title');
+      titleEl.textContent = currentTitle;
+      head.appendChild(titleEl);
+      document.documentElement.appendChild(head);
+
       document.documentElement.style.margin = '0';
       document.documentElement.style.padding = '0';
       document.documentElement.style.width = '100%';
       document.documentElement.style.height = '100%';
       document.documentElement.style.overflow = 'hidden';
-      // Можно поставить черный фон на время прогрузки фрейма, чтобы не было белой вспышки.
       document.documentElement.style.backgroundColor = '#000000'; 
       
       const body = document.createElement('body');
@@ -32,13 +52,55 @@ chrome.storage.local.get(['site1', 'site2', 'enabled'], (data) => {
       iframe.style.border = 'none';
       iframe.style.margin = '0';
       iframe.style.padding = '0';
-      // Убирает невидимый отступ под фреймом, который может вызвать прокрутку.
       iframe.style.display = 'block'; 
       
       iframe.sandbox = "allow-scripts allow-same-origin allow-forms allow-popups";
       
       body.appendChild(iframe);
       document.documentElement.appendChild(body);
+    };
+
+    // Быстрый запуск подмены
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', initReplacement);
+    } else {
+      initReplacement();
+    }
+  }
+
+  // Логика для iframe (Сайт 1)
+  if (isIframe) {
+    // Проверка целевой вкладки
+    chrome.runtime.sendMessage({ action: "checkIfTargetTab" }, (response) => {
+      if (response && response.isTarget) {
+        let lastTitle = "";
+        
+        const sendTitle = () => {
+          const currentTitle = document.title || document.querySelector('title')?.innerText || "";
+          if (currentTitle && currentTitle !== lastTitle) {
+            lastTitle = currentTitle;
+            chrome.runtime.sendMessage({ action: "iframeTitleChanged", title: currentTitle });
+          }
+        };
+
+        sendTitle();
+        window.addEventListener('DOMContentLoaded', sendTitle);
+        window.addEventListener('load', sendTitle);
+
+        // Отслеживание динамического изменения title
+        const observer = new MutationObserver(sendTitle);
+        const startObserving = () => {
+          const titleEl = document.querySelector('title');
+          if (titleEl) {
+            observer.observe(titleEl, { childList: true, characterData: true, subtree: true });
+          } else if (document.head) {
+            observer.observe(document.head, { childList: true, subtree: true });
+          } else {
+            setTimeout(startObserving, 100);
+          }
+        };
+        startObserving();
+      }
     });
   }
 });

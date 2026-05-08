@@ -10,11 +10,10 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
   });
 });
 
-chrome.runtime.onMessage.addListener((message) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "updateRules") {
-    // Правила для заголовков теперь применяются к любому ресурсу, 
-    // который загружается внутри iframe. Это нужно, чтобы сайт мог открыться.
-    const rules = [{
+    // Разрешаем показ iframe
+    const rules =[{
       "id": 1,
       "priority": 1,
       "action": {
@@ -25,14 +24,30 @@ chrome.runtime.onMessage.addListener((message) => {
           { "header": "frame-options", "operation": "remove" }
         ]
       },
-      "condition": {
-        "resourceTypes": ["sub_frame"]
-      }
+      "condition": { "resourceTypes": ["sub_frame"] }
     }];
 
     chrome.declarativeNetRequest.updateDynamicRules({
       removeRuleIds: [1],
-      addRules: message.enabled ? rules : []
+      addRules: message.enabled ? rules :[]
+    });
+  }
+
+  // Проверка, что iframe находится в нужной вкладке
+  if (message.action === "checkIfTargetTab" && sender.tab) {
+    chrome.storage.local.get(['site2', 'enabled'], (data) => {
+      const isTarget = !!(data.enabled && data.site2 && sender.tab.url && sender.tab.url.startsWith(data.site2));
+      sendResponse({ isTarget });
+    });
+    return true; 
+  }
+
+  // Передача title из iframe в главное окно
+  if (message.action === "iframeTitleChanged" && sender.tab) {
+    chrome.storage.local.get(['site2', 'enabled'], (data) => {
+      if (data.enabled && data.site2 && sender.tab.url && sender.tab.url.startsWith(data.site2)) {
+        chrome.tabs.sendMessage(sender.tab.id, { action: "updateTitle", title: message.title }, { frameId: 0 }).catch(() => {});
+      }
     });
   }
 });
