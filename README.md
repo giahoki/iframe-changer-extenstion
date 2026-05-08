@@ -44,15 +44,6 @@ This extension lets you:
 
 Now when you visit YouTube, you'll see Google inside an iframe instead!
 
-## Features
-
-✨ Simple popup interface
-✨ Easy URL configuration
-✨ Toggle on/off instantly
-✨ Auto-adds `https://` if you forget it
-✨ Smooth full-screen iframe display
-✨ Settings saved locally
-
 ## Important Notes
 
 ⚠️ Some websites may not work inside iframes due to security restrictions
