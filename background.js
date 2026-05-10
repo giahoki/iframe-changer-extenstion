@@ -1,5 +1,5 @@
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
-  if (details.frameId !== 0) return;
+  if (details.frameId !== 0 || details.tabId < 0) return;
 
   chrome.storage.local.get(['site1', 'site2', 'enabled'], (data) => {
     if (!data.enabled || !data.site1 || !data.site2) return;
@@ -12,7 +12,6 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "updateRules") {
-    // Разрешаем показ iframe
     const rules =[{
       "id": 1,
       "priority": 1,
@@ -33,7 +32,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
   }
 
-  // Проверка, что iframe находится в нужной вкладке
   if (message.action === "checkIfTargetTab" && sender.tab) {
     chrome.storage.local.get(['site2', 'enabled'], (data) => {
       const isTarget = !!(data.enabled && data.site2 && sender.tab.url && sender.tab.url.startsWith(data.site2));
@@ -42,7 +40,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; 
   }
 
-  // Передача title из iframe в главное окно
   if (message.action === "iframeTitleChanged" && sender.tab) {
     chrome.storage.local.get(['site2', 'enabled'], (data) => {
       if (data.enabled && data.site2 && sender.tab.url && sender.tab.url.startsWith(data.site2)) {

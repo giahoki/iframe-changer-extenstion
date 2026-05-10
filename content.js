@@ -1,106 +1,114 @@
-chrome.storage.local.get(['site1', 'site2', 'enabled'], (data) => {
-  if (!data.enabled || !data.site1 || !data.site2) return;
+const dict = {
+  ru: {
+    title: "Настройка<br>редиректов",
+    subtitle: "Укажите сайты для показа контента и ссылку для перехода",
+    site1Title: "Сайт 1",
+    site1Sub: "Чей контент показываем",
+    site2Title: "Сайт 2",
+    site2Sub: "Какую ссылку показываем",
+    toggleTitle: "Включить подмену",
+    toggleSub: "Все переходы будут перенаправляться",
+    btnText: "Сохранить изменения",
+    saved: "Сохранено!",
+    langBtn: "EN",
+    customTitle: "Свой Title страницы",
+    customTitlePlaceholder: "Будет браться из 1 ссылки"
+  },
+  en: {
+    title: "Redirect<br>Settings",
+    subtitle: "Specify the sites to show content and the redirect link",
+    site1Title: "Site 1",
+    site1Sub: "Whose content we show",
+    site2Title: "Site 2",
+    site2Sub: "Which link we show",
+    toggleTitle: "Enable spoofing",
+    toggleSub: "All transitions will be redirected",
+    btnText: "Save changes",
+    saved: "Saved!",
+    langBtn: "RU",
+    customTitle: "Custom Page Title",
+    customTitlePlaceholder: "Will be taken from Site 1"
+  }
+};
 
-  const isMainPage = window.location.href.startsWith(data.site2) && window === window.top;
-  const isIframe = window !== window.top;
+const browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+let currentLang = browserLang.startsWith('ru') ? 'ru' : 'en';
 
-  // Логика главной страницы (Сайт 2)
-  if (isMainPage) {
-    // Прячем URL вкладки
-    document.title = '\u200B';
+function applyLang() {
+  document.getElementById('t-title').innerHTML = dict[currentLang].title;
+  document.getElementById('t-subtitle').innerText = dict[currentLang].subtitle;
+  document.getElementById('t-site1Title').innerText = dict[currentLang].site1Title;
+  document.getElementById('t-site1Sub').innerText = dict[currentLang].site1Sub;
+  document.getElementById('t-site2Title').innerText = dict[currentLang].site2Title;
+  document.getElementById('t-site2Sub').innerText = dict[currentLang].site2Sub;
+  document.getElementById('t-toggleTitle').innerText = dict[currentLang].toggleTitle;
+  document.getElementById('t-toggleSub').innerText = dict[currentLang].toggleSub;
+  document.getElementById('btnText').innerText = dict[currentLang].btnText;
+  document.getElementById('langBtn').innerText = dict[currentLang].langBtn;
+  document.getElementById('t-customTitleText').innerText = dict[currentLang].customTitle;
+  document.getElementById('customTitle').placeholder = dict[currentLang].customTitlePlaceholder;
+}
 
-    // Получаем title из фрейма
-    chrome.runtime.onMessage.addListener((message) => {
-      if (message.action === "updateTitle" && message.title) {
-        document.title = message.title;
-      }
-    });
+document.addEventListener('DOMContentLoaded', () => {
+  const site1Input = document.getElementById('site1');
+  const site2Input = document.getElementById('site2');
+  const customTitleInput = document.getElementById('customTitle');
+  const enabledCheckbox = document.getElementById('enabled');
+  const saveBtn = document.getElementById('saveBtn');
+  const btnText = document.getElementById('btnText');
+  const langBtn = document.getElementById('langBtn');
+  
+  const body = document.body;
+  const blobs = document.querySelectorAll('.blob');
+  
+  body.addEventListener('mousemove', (event) => {
+    const { clientX, clientY } = event;
+    body.style.background = `radial-gradient(600px circle at ${clientX}px ${clientY}px, #ffffff 0%, #1a1a1a 40%, #050505 70%)`;
 
-    const initReplacement = () => {
-      const currentTitle = document.title;
-      document.documentElement.innerHTML = '';
-      
-      // Восстанавливаем <head> и <title>
-      const head = document.createElement('head');
-      const titleEl = document.createElement('title');
-      titleEl.textContent = currentTitle;
-      head.appendChild(titleEl);
-      document.documentElement.appendChild(head);
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const moveX = (clientX - centerX);
+    const moveY = (clientY - centerY);
+    blobs[0].style.transform = `translate(${moveX * 0.05}px, ${moveY * 0.05}px)`;
+    blobs[1].style.transform = `translate(${moveX * -0.03}px, ${moveY * -0.03}px)`;
+  });
 
-      document.documentElement.style.margin = '0';
-      document.documentElement.style.padding = '0';
-      document.documentElement.style.width = '100%';
-      document.documentElement.style.height = '100%';
-      document.documentElement.style.overflow = 'hidden';
-      document.documentElement.style.backgroundColor = '#000000'; 
-      
-      const body = document.createElement('body');
-      body.style.margin = '0';
-      body.style.padding = '0';
-      body.style.width = '100%';
-      body.style.height = '100%';
-      body.style.overflow = 'hidden';
-
-      const iframe = document.createElement('iframe');
-      iframe.src = data.site1;
-      
-      iframe.style.position = 'fixed';
-      iframe.style.top = '0';
-      iframe.style.left = '0';
-      iframe.style.width = '100%';
-      iframe.style.height = '100%';
-      iframe.style.border = 'none';
-      iframe.style.margin = '0';
-      iframe.style.padding = '0';
-      iframe.style.display = 'block'; 
-      
-      iframe.sandbox = "allow-scripts allow-same-origin allow-forms allow-popups";
-      
-      body.appendChild(iframe);
-      document.documentElement.appendChild(body);
-    };
-
-    // Быстрый запуск подмены
-    if (document.readyState === 'loading') {
-      window.addEventListener('DOMContentLoaded', initReplacement);
-    } else {
-      initReplacement();
+  chrome.storage.local.get(['site1', 'site2', 'enabled', 'lang', 'customTitle'], (data) => {
+    if (data.site1) site1Input.value = data.site1;
+    if (data.site2) site2Input.value = data.site2;
+    if (data.customTitle) customTitleInput.value = data.customTitle;
+    if (data.enabled !== undefined) enabledCheckbox.checked = data.enabled;
+    
+    if (data.lang) {
+      currentLang = data.lang;
     }
-  }
+    
+    applyLang();
+  });
 
-  // Логика для iframe (Сайт 1)
-  if (isIframe) {
-    // Проверка целевой вкладки
-    chrome.runtime.sendMessage({ action: "checkIfTargetTab" }, (response) => {
-      if (response && response.isTarget) {
-        let lastTitle = "";
-        
-        const sendTitle = () => {
-          const currentTitle = document.title || document.querySelector('title')?.innerText || "";
-          if (currentTitle && currentTitle !== lastTitle) {
-            lastTitle = currentTitle;
-            chrome.runtime.sendMessage({ action: "iframeTitleChanged", title: currentTitle });
-          }
-        };
+  langBtn.addEventListener('click', () => {
+    currentLang = currentLang === 'ru' ? 'en' : 'ru';
+    chrome.storage.local.set({ lang: currentLang });
+    applyLang();
+  });
 
-        sendTitle();
-        window.addEventListener('DOMContentLoaded', sendTitle);
-        window.addEventListener('load', sendTitle);
+  saveBtn.addEventListener('click', () => {
+    let site1 = site1Input.value.trim();
+    let site2 = site2Input.value.trim();
+    let customTitle = customTitleInput.value.trim();
+    let enabled = enabledCheckbox.checked;
 
-        // Отслеживание динамического изменения title
-        const observer = new MutationObserver(sendTitle);
-        const startObserving = () => {
-          const titleEl = document.querySelector('title');
-          if (titleEl) {
-            observer.observe(titleEl, { childList: true, characterData: true, subtree: true });
-          } else if (document.head) {
-            observer.observe(document.head, { childList: true, subtree: true });
-          } else {
-            setTimeout(startObserving, 100);
-          }
-        };
-        startObserving();
-      }
+    if (site1 && !site1.startsWith('http')) site1 = 'https://' + site1;
+    if (site2 && !site2.startsWith('http')) site2 = 'https://' + site2;
+
+    chrome.storage.local.set({ site1, site2, enabled, customTitle }, () => {
+      btnText.innerText = dict[currentLang].saved;
+      
+      setTimeout(() => {
+        btnText.innerText = dict[currentLang].btnText;
+      }, 1500);
+
+      chrome.runtime.sendMessage({ action: "updateRules", site1, site2, enabled });
     });
-  }
+  });
 });
