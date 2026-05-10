@@ -9,7 +9,7 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
-  "permissions":[
+  "permissions": [
     "storage",
     "declarativeNetRequest",
     "webNavigation",
@@ -30,7 +30,7 @@
   "background": {
     "service_worker": "background.js"
   },
-  "content_scripts":[
+  "content_scripts": [
     {
       "matches": ["<all_urls>"],
       "js": ["content.js"],
