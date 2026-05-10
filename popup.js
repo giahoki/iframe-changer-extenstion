@@ -12,7 +12,7 @@ const dict = {
     saved: "Сохранено!",
     langBtn: "EN",
     customTitle: "Свой Title страницы",
-    customTitlePlaceholder: "Оставить как есть"
+    customTitlePlaceholder: "Будет браться из 1 ссылки"
   },
   en: {
     title: "Redirect<br>Settings",
@@ -27,7 +27,7 @@ const dict = {
     saved: "Saved!",
     langBtn: "RU",
     customTitle: "Custom Page Title",
-    customTitlePlaceholder: "Leave as is"
+    customTitlePlaceholder: "Will be taken from Site 1"
   }
 };
 
