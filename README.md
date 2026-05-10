@@ -52,11 +52,41 @@ Now when you visit YouTube, you'll see Google inside an iframe instead!
 
 ## File Structure
 
-- `manifest.json` - Extension configuration
-- `popup.html` - Settings panel UI
-- `popup.js` - Popup logic and settings management
-- `background.js` - Handles URL redirects
-- `content.js` - Embeds the iframe on the page
+```
+iframe-changer-extenstion/
+├── README.md                 # Project documentation
+├── manifest.json            # Extension configuration and permissions
+├── popup.html               # Settings panel UI
+├── popup.js                 # Popup logic and settings management
+├── background.js            # Handles URL redirects
+├── content.js               # Embeds the iframe on the page
+└── icons/
+    ├── icon16.png           # 16x16px icon
+    ├── icon32.png           # 32x32px icon
+    ├── icon48.png           # 48x48px icon
+    └── icon128.png          # 128x128px icon (main icon)
+```
+
+## File Descriptions
+
+### Core Files
+
+| File | Purpose |
+|------|---------|
+| **manifest.json** | Defines extension metadata, permissions, and scripts to load |
+| **popup.html** | HTML structure for the extension settings panel |
+| **popup.js** | JavaScript logic for handling user settings and storage |
+| **background.js** | Service worker that intercepts and redirects URL requests |
+| **content.js** | Injects and manages the iframe on web pages |
+
+### Assets
+
+| File | Purpose |
+|------|---------|
+| **icon16.png** | Small icon for extension toolbar |
+| **icon32.png** | Medium icon for extension menu |
+| **icon48.png** | Icon for extension page |
+| **icon128.png** | Large icon for webstore (if published) |
 
 ## How the code works
 
@@ -65,3 +95,5 @@ Now when you visit YouTube, you'll see Google inside an iframe instead!
 **content.js** - When you're on Site 1, it displays Site 2 in an iframe instead
 
 **popup.js** - The settings window where you configure which sites to swap
+
+**popup.html** - The UI for the settings window with input fields and controls
