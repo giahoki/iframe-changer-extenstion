@@ -1,6 +1,6 @@
 # iframe-changer-extenstion
 
-[![Get the Add-on](https://extensionworkshop.com/assets/img/documentation/publish/get-the-addon-178x60px.png)](https://addons.mozilla.org/ru/firefox/addon/iframe-changer/)
+[![Get the Add-on for Firefox](https://img.shields.io/badge/Get%20for%20Firefox-FF7139?style=for-the-badge&logo=firefox&logoColor=white)](https://addons.mozilla.org/ru/firefox/addon/iframe-changer/)
 
 A simple browser extension that redirects one website and displays it inside another using an iframe.
 
