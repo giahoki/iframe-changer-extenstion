@@ -55,7 +55,6 @@ function applyLang() {
   document.getElementById('t-snowSub').innerText = dict[currentLang].snowSub;
 }
 
-// Snow animation
 let snowAnimationId = null;
 let snowflakes = [];
 let snowEnabled = false;

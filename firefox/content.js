@@ -16,7 +16,7 @@ browser.storage.local.get(['site1', 'site2', 'enabled', 'customTitle']).then((da
     const initReplacement = () => {
       const currentTitle = document.title;
       document.documentElement.innerHTML = '';
-
+      
       const head = document.createElement('head');
       const titleEl = document.createElement('title');
       titleEl.textContent = currentTitle;
@@ -28,8 +28,8 @@ browser.storage.local.get(['site1', 'site2', 'enabled', 'customTitle']).then((da
       document.documentElement.style.width = '100%';
       document.documentElement.style.height = '100%';
       document.documentElement.style.overflow = 'hidden';
-      document.documentElement.style.backgroundColor = '#000000';
-
+      document.documentElement.style.backgroundColor = '#000000'; 
+      
       const body = document.createElement('body');
       body.style.margin = '0';
       body.style.padding = '0';
@@ -39,7 +39,7 @@ browser.storage.local.get(['site1', 'site2', 'enabled', 'customTitle']).then((da
 
       const iframe = document.createElement('iframe');
       iframe.src = data.site1;
-
+      
       iframe.style.position = 'fixed';
       iframe.style.top = '0';
       iframe.style.left = '0';
@@ -48,10 +48,10 @@ browser.storage.local.get(['site1', 'site2', 'enabled', 'customTitle']).then((da
       iframe.style.border = 'none';
       iframe.style.margin = '0';
       iframe.style.padding = '0';
-      iframe.style.display = 'block';
-
+      iframe.style.display = 'block'; 
+      
       iframe.sandbox = "allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-popups-to-escape-sandbox";
-
+      
       body.appendChild(iframe);
       document.documentElement.appendChild(body);
     };
@@ -67,7 +67,7 @@ browser.storage.local.get(['site1', 'site2', 'enabled', 'customTitle']).then((da
     browser.runtime.sendMessage({ action: "checkIfTargetTab" }).then((response) => {
       if (response && response.isTarget && !data.customTitle) {
         let lastTitle = "";
-
+        
         const sendTitle = () => {
           const currentTitle = document.title || document.querySelector('title')?.innerText || "";
           if (currentTitle && currentTitle !== lastTitle) {

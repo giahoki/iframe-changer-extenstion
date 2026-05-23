@@ -1,5 +1,7 @@
 # iframe-changer-extenstion
 
+[![Get the Add-on](https://extensionworkshop.com/assets/img/documentation/publish/get-the-addon-178x60px.png)](https://addons.mozilla.org/ru/firefox/addon/iframe-changer/)
+
 A simple browser extension that redirects one website and displays it inside another using an iframe.
 
 ## What does it do?
@@ -21,6 +23,10 @@ This extension lets you:
 
 ## Installation
 
+### Firefox
+[Install from Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/iframe-changer/)
+
+### Chrome / Chromium browsers
 1. Download or clone this repository
 2. Open Chrome and go to `chrome://extensions/`
 3. Turn on **Developer mode** (top right)
@@ -60,11 +66,10 @@ iframe-changer-extenstion/
 ├── popup.js                 # Popup logic and settings management
 ├── background.js            # Handles URL redirects
 ├── content.js               # Embeds the iframe on the page
-└── icons/
-    ├── icon16.png           # 16x16px icon
-    ├── icon32.png           # 32x32px icon
-    ├── icon48.png           # 48x48px icon
-    └── icon128.png          # 128x128px icon (main icon)
+├── polyfill.js              # Cross-browser browser.* shim
+├── icons/
+│   └── img.png              # Extension icon
+└── firefox/                 # Firefox-specific build
 ```
 
 ## File Descriptions
@@ -83,10 +88,7 @@ iframe-changer-extenstion/
 
 | File | Purpose |
 |------|---------|
-| **icon16.png** | Small icon for extension toolbar |
-| **icon32.png** | Medium icon for extension menu |
-| **icon48.png** | Icon for extension page |
-| **icon128.png** | Large icon for webstore (if published) |
+| **icons/img.png** | Extension icon (used for all sizes) |
 
 ## How the code works
 
