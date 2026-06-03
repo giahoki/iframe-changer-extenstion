@@ -1,101 +1,113 @@
 # iframe-changer-extenstion
 
 [![Get the Add-on for Firefox](https://img.shields.io/badge/Get%20for%20Firefox-FF7139?style=for-the-badge&logo=firefox&logoColor=white)](https://addons.mozilla.org/ru/firefox/addon/iframe-changer/)
+[![Version](https://img.shields.io/badge/version-1.1.0-6750A4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://github.com/giahoki/iframe-changer-extenstion/releases/latest)
 
-A simple browser extension that redirects one website and displays it inside another using an iframe.
+A browser extension that redirects one website and displays it inside another using an iframe, with a fully authentic **Material Design 3** settings panel.
 
 ## What does it do?
 
-This extension lets you:
-- Visit **Website B**
-- But see **Website A** displayed inside it
-- All transparently - it looks like you're on Website A
+- Visit **Website B** but see **Website A** displayed inside it
+- All transparently — looks like you're on Website A
+- Configure everything from a Google-style MD3 popup (light/dark, 12 accent presets, animations)
 
-## How it works
+## What's new in 1.1.0
 
-**Step 1:** You visit `https://example.com` (Website B)
+Full **Material You** redesign of the popup:
 
-**Step 2:** The extension redirects you to `https://redirect-to.com` (Website A)
-
-**Step 3:** Website A loads inside an iframe on the redirect page
-
-**Result:** You see Website A's content, but the URL bar shows Website B's address
+- **Authentic MD3 color system** — HCT color space via Google's [material-color-utilities](https://github.com/material-foundation/material-color-utilities), full 30+ design tokens (`primary`, `primaryContainer`, `surfaceContainer*`, `onPrimaryContainer`, …), tonal palette derived from your accent color
+- **8 visual effects** bound to the active palette: snow, rain, stars, aurora, bubbles, fireflies, liquid, confetti
+- **MD3 components**: top app bar, extended FAB, outlined text fields with floating labels, MD3 switch, segmented button, list items, snackbar
+- **12 accent presets** + random accent generation (`Hct.from(hue, chroma, tone)`)
+- **Animated color transitions** on every token (MD3 `long2` × `emphasized` curve)
+- **Snackbar** slides down from the top with elevation
+- Russian (default) / English UI
 
 ## Installation
 
 ### Firefox
 [Install from Firefox Add-ons](https://addons.mozilla.org/ru/firefox/addon/iframe-changer/)
 
-### Chrome / Chromium browsers
+### Chrome / Chromium / Edge
 1. Download or clone this repository
-2. Open Chrome and go to `chrome://extensions/`
-3. Turn on **Developer mode** (top right)
+2. Open `chrome://extensions/`
+3. Enable **Developer mode** (top right)
 4. Click **Load unpacked**
 5. Select this folder
-6. Done! The extension is now installed
 
 ## How to use
 
-1. Click the extension icon in your browser toolbar
+1. Click the extension icon in the toolbar
 2. Enter two URLs:
-   - **Site 1:** The website you want to see
-   - **Site 2:** The website address that will display it
-3. Check the box to enable the extension
-4. Click **Save changes**
+   - **Site 1** — the website you want to see
+   - **Site 2** — the address that will display it
+3. Toggle the switch to enable
+4. Pick an accent (or hit the random button)
+5. Optionally choose a background effect
+6. Click **Save**
 
 ### Example
 
-- **Site 1:** `https://www.google.com`
-- **Site 2:** `https://www.youtube.com`
+| Field  | Value                          |
+|--------|--------------------------------|
+| Site 1 | `https://www.google.com`       |
+| Site 2 | `https://www.youtube.com`      |
 
-Now when you visit YouTube, you'll see Google inside an iframe instead!
+Visiting YouTube will now show Google inside the iframe.
 
-## Important Notes
+## Important notes
 
-⚠️ Some websites may not work inside iframes due to security restrictions
-⚠️ This is a development tool - use responsibly
-⚠️ Some features might not work properly in iframes (pop-ups, redirects, etc.)
+- Some sites block iframing via `X-Frame-Options` / `CSP` — the iframe may not load
+- This is a development tool — use responsibly
+- Pop-ups, redirects and other in-iframe features may not work as expected
 
-## File Structure
+## File structure
 
 ```
 iframe-changer-extenstion/
-├── README.md                 # Project documentation
-├── manifest.json            # Extension configuration and permissions
-├── popup.html               # Settings panel UI
-├── popup.js                 # Popup logic and settings management
-├── background.js            # Handles URL redirects
-├── content.js               # Embeds the iframe on the page
-├── polyfill.js              # Cross-browser browser.* shim
+├── README.md                       # Project documentation
+├── manifest.json                   # Chrome / MV3 manifest
+├── popup.html                      # MD3 settings panel UI
+├── popup.js                        # Palette engine, effects, settings
+├── background.js                   # URL redirect handler
+├── content.js                      # Iframe injector
+├── polyfill.js                     # Cross-browser browser.* shim
+├── lib/
+│   └── material-color-utilities.js # Google MCU IIFE bundle (HCT + schemes)
 ├── icons/
-│   └── img.png              # Extension icon
-└── firefox/                 # Firefox-specific build
+│   ├── img.png                     # Default icon
+│   ├── icon16.png
+│   ├── icon32.png
+│   ├── icon48.png
+│   └── icon128.png
+└── firefox/                        # Firefox / MV2 build
+    ├── manifest.json
+    ├── popup.html
+    ├── popup.js
+    ├── background.js
+    ├── content.js
+    ├── lib/
+    │   └── material-color-utilities.js
+    └── icons/
 ```
 
-## File Descriptions
+## How it works
 
-### Core Files
+- **`background.js`** — intercepts navigation to Site 2, redirects to Site 1
+- **`content.js`** — on Site 1, replaces the document with an iframe of Site 2
+- **`popup.html` / `popup.js`** — MD3 settings panel, persists `site1`, `site2`, `enabled`, `accent`, `effect` to `browser.storage.local`
+- **`lib/material-color-utilities.js`** — bundled Google library that turns any hex accent into the full Material You tonal palette (primary, secondary, tertiary, neutral, neutral-variant at all 18 tones)
 
-| File | Purpose |
-|------|---------|
-| **manifest.json** | Defines extension metadata, permissions, and scripts to load |
-| **popup.html** | HTML structure for the extension settings panel |
-| **popup.js** | JavaScript logic for handling user settings and storage |
-| **background.js** | Service worker that intercepts and redirects URL requests |
-| **content.js** | Injects and manages the iframe on web pages |
+## Permissions
 
-### Assets
+| Permission            | Why                                            |
+|-----------------------|------------------------------------------------|
+| `storage`             | Save your sites, accent and effect             |
+| `webRequest` / `webRequestBlocking` | Intercept and redirect Site 2 → Site 1 |
+| `webNavigation`       | Detect navigations on the target sites         |
+| `tabs`                | Update tab state on enable/disable              |
+| `<all_urls>`          | Apply the rules to every site                  |
 
-| File | Purpose |
-|------|---------|
-| **icons/img.png** | Extension icon (used for all sizes) |
+## License
 
-## How the code works
-
-**background.js** - When you visit Site 2, it redirects you to Site 1
-
-**content.js** - When you're on Site 1, it displays Site 2 in an iframe instead
-
-**popup.js** - The settings window where you configure which sites to swap
-
-**popup.html** - The UI for the settings window with input fields and controls
+MIT
