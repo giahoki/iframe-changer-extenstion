@@ -1,0 +1,20 @@
+{
+  "name": "iframe-changer",
+  "version": "1.2.0",
+  "private": true,
+  "description": "Cross-browser (Chrome + Firefox, Manifest V3) extension that shows one site inside another via an iframe.",
+  "scripts": {
+    "dev:firefox": "web-ext run --source-dir src --target firefox-desktop",
+    "dev:chrome": "web-ext run --source-dir src --target chromium",
+    "lint": "web-ext lint --source-dir src",
+    "build": "node scripts/build.mjs",
+    "build:lib": "node scripts/build-lib.mjs",
+    "source-zip": "git archive --format=zip --output dist/source.zip HEAD",
+    "check": "node scripts/check.mjs"
+  },
+  "devDependencies": {
+    "@material/material-color-utilities": "0.2.7",
+    "esbuild": "^0.20.0",
+    "web-ext": "^8.0.0"
+  }
+}
